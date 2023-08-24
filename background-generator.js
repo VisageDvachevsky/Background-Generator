@@ -1,26 +1,15 @@
-class BackgroundGenerator {
-  constructor(options) {
-    this.options = {
-      gradientInterval: options.gradientInterval || 4500,
-      initialColors: options.initialColors || ['rgb(255, 0, 0)', 'rgb(0, 0, 255)'],
-    };
-
+class SmartGradientGenerator {
+  constructor() {
     this.previousGradient = {
-      colors: this.options.initialColors,
+      colors: this.generatePreviousGradientArray(70),
       direction: 0,
     };
-
-    this.applySmartGradient = this.applySmartGradient.bind(this);
-  }
-
-  start() {
-    this.applySmartGradient();
-    setInterval(this.applySmartGradient, this.options.gradientInterval);
   }
 
   applySmartGradient() {
     const newColors = this.generateSimilarColors(this.previousGradient.colors);
-    const gradientDirection = (this.previousGradient.direction + this.randomInRange(-20, 20) + 360) % 360;
+    const gradientDirection =
+      (this.previousGradient.direction + this.randomInRange(-25, 25) + 360) % 360;
     const newGradient = `linear-gradient(${gradientDirection}deg, ${newColors[0]}, ${newColors[1]})`;
 
     const backgroundElement = document.createElement("div");
@@ -46,7 +35,7 @@ class BackgroundGenerator {
 
     for (const baseColor of baseColors) {
       const color = this.parseRGB(baseColor);
-      const hueShift = this.randomInRange(-45, 45);
+      const hueShift = this.randomInRange(-35, 35);
       const newColor = this.adjustHue(color, hueShift);
       similarColors.push(newColor);
     }
@@ -69,7 +58,7 @@ class BackgroundGenerator {
     return `rgb(${newRgb.r}, ${newRgb.g}, ${newRgb.b})`;
   }
 
-  function rgbToHsl(r, g, b) {
+  rgbToHsl(r, g, b) {
     r /= 255;
     g /= 255;
     b /= 255;
@@ -97,7 +86,7 @@ class BackgroundGenerator {
     return { h: h * 360, s: s * 100, l: l * 100 };
   }
 
-  function hslToRgb(h, s, l) {
+  hslToRgb(h, s, l) {
     s /= 100;
     l /= 100;
     const c = (1 - Math.abs(2 * l - 1)) * s;
@@ -125,7 +114,22 @@ class BackgroundGenerator {
 
     return { r, g, b };
   }
-  
+
+  generatePreviousGradientArray(count) {
+    const gradientArray = [];
+    for (let i = 0; i < count; i++) {
+      gradientArray.push(this.generateRandomRGB());
+    }
+    return gradientArray;
+  }
+
+  generateRandomRGB() {
+    const r = Math.floor(Math.random() * 256);
+    const g = Math.floor(Math.random() * 256);
+    const b = Math.floor(Math.random() * 256);
+    return `rgb(${r}, ${g}, ${b})`;
+  }
 }
 
-export default BackgroundGenerator;
+const gradientGenerator = new SmartGradientGenerator();
+setInterval(() => gradientGenerator.applySmartGradient(), 5000);

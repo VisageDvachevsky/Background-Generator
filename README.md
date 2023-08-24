@@ -5,18 +5,13 @@
 1. Include the script in your HTML file:
 
    ```html
-   <script type="module" src="main.js"></script>
+      <script type="module" src="background-generator.js"></script>
    ```
 2. Create an instance of BackgroundGenerator and start it in your main.js:
     ```javascript
-    import BackgroundGenerator from "./background-generator.js";
+      import { SmartGradientGenerator } from './background-generator';
 
-    const options = {
-    gradientInterval: 4500,
-    initialColors: ['rgb(255, 0, 0)', 'rgb(0, 0, 255)'],
-    };
-
-    const backgroundGenerator = new BackgroundGenerator(options);
-    backgroundGenerator.start();
+      const gradientGenerator = new SmartGradientGenerator();
+      setInterval(() => gradientGenerator.applySmartGradient(), 5000);
     ```
 
