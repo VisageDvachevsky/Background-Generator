@@ -8,7 +8,7 @@ A JavaScript library for generating dynamic, transitioning background gradients.
 - Randomly changing gradient directions.
 - Customizable transition duration and update interval.
 
-![Demo](assets/demo.gif)
+![Demo](./assets/demo.gif)
 
 ## Installation
 
@@ -32,10 +32,22 @@ To use the background generator, simply create a new instance of the `GradientBa
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Background Generator Example</title>
     <script src="background-generator.js"></script>
+    <style>
+        body {
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+    </style>
 </head>
 <body>
+    <h1>Dynamic Background Gradient</h1>
     <script>
-        // Create a new GradientBackground instance
+        // Create a new GradientBackground instance with default settings
         new GradientBackground();
     </script>
 </body>
@@ -54,8 +66,20 @@ You can customize the transition duration and update interval by passing paramet
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customized Background Generator</title>
     <script src="background-generator.js"></script>
+    <style>
+        body {
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+    </style>
 </head>
 <body>
+    <h1>Customized Background Gradient</h1>
     <script>
         // Create a new GradientBackground instance with custom settings
         const interval = 200; // Update interval in milliseconds
@@ -142,7 +166,6 @@ Explore different usage examples:
 - [Basic Example](examples/example1.html)
 - [Customized Interval and Duration](examples/example2.html)
 - [Multiple Instances](examples/example3.html)
-- [Different Color Sets](examples/example4.html)
-- [Pausing and Resuming Animation](examples/example5.html)
+- [Pausing and Resuming Animation](examples/example4.html)
 
 To view an example, open the corresponding HTML file in your browser.
