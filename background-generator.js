@@ -1,135 +1,98 @@
-class SmartGradientGenerator {
-  constructor() {
-    this.previousGradient = {
-      colors: this.generatePreviousGradientArray(70),
-      direction: 0,
-    };
-  }
-
-  applySmartGradient() {
-    const newColors = this.generateSimilarColors(this.previousGradient.colors);
-    const gradientDirection =
-      (this.previousGradient.direction + this.randomInRange(-25, 25) + 360) % 360;
-    const newGradient = `linear-gradient(${gradientDirection}deg, ${newColors[0]}, ${newColors[1]})`;
-
-    const backgroundElement = document.createElement("div");
-    backgroundElement.className = "background-overlay";
-    backgroundElement.style.backgroundImage = newGradient;
-    document.body.appendChild(backgroundElement);
-
-    setTimeout(() => {
-      document.body.removeChild(backgroundElement);
-      document.body.style.backgroundImage = newGradient;
-    }, 1000);
-
-    this.previousGradient.colors = newColors;
-    this.previousGradient.direction = gradientDirection;
-  }
-
-  randomInRange(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-
-  generateSimilarColors(baseColors) {
-    const similarColors = [];
-
-    for (const baseColor of baseColors) {
-      const color = this.parseRGB(baseColor);
-      const hueShift = this.randomInRange(-35, 35);
-      const newColor = this.adjustHue(color, hueShift);
-      similarColors.push(newColor);
+class GradientBackground {
+    constructor(interval = 100, transitionDuration = 4000) {
+        this.interval = interval;
+        this.transitionDuration = transitionDuration;
+        this.colorManager = new ColorManager(5);
+        this.directionManager = new DirectionManager();
+        this.colorChangeCounter = 0;
+        this.colorChangeThreshold = Math.floor(transitionDuration / interval); 
+        this.init();
     }
 
-    return similarColors;
-  }
+    updateGradient() {
+        const step = 1 / this.colorChangeThreshold; 
+        this.colorManager.updateCurrentColors(step);
+        this.directionManager.updateCurrentDirection(step);
+        this.setGradient(this.colorManager.currentColors, this.directionManager.currentDirection);
 
-  parseRGB(rgbString) {
-    const [r, g, b] = rgbString.match(/\d+/g);
-    return { r: parseInt(r), g: parseInt(g), b: parseInt(b) };
-  }
-
-  adjustHue(color, degrees) {
-    const { r, g, b } = color;
-    const hsl = this.rgbToHsl(r, g, b);
-
-    const newHue = (hsl.h + degrees + 360) % 360;
-    const newRgb = this.hslToRgb(newHue, hsl.s, hsl.l);
-
-    return `rgb(${newRgb.r}, ${newRgb.g}, ${newRgb.b})`;
-  }
-
-  rgbToHsl(r, g, b) {
-    r /= 255;
-    g /= 255;
-    b /= 255;
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    let h, s, l = (max + min) / 2;
-
-    if (max === min) {
-      h = s = 0;
-    } else {
-      const d = max - min;
-      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-
-      if (max === r) {
-        h = (g - b) / d + (g < b ? 6 : 0);
-      } else if (max === g) {
-        h = (b - r) / d + 2;
-      } else if (max === b) {
-        h = (r - g) / d + 4;
-      }
-
-      h /= 6;
+        this.colorChangeCounter++;
+        if (this.colorChangeCounter >= this.colorChangeThreshold) {
+            this.colorChangeCounter = 0;
+            this.colorManager.setNextColors();
+            this.directionManager.setNextDirection();
+        }
     }
 
-    return { h: h * 360, s: s * 100, l: l * 100 };
-  }
-
-  hslToRgb(h, s, l) {
-    s /= 100;
-    l /= 100;
-    const c = (1 - Math.abs(2 * l - 1)) * s;
-    const x = c * (1 - Math.abs((h / 60) % 2 - 1));
-    const m = l - c / 2;
-    let r, g, b;
-
-    if (h >= 0 && h < 60) {
-      r = c; g = x; b = 0;
-    } else if (h >= 60 && h < 120) {
-      r = x; g = c; b = 0;
-    } else if (h >= 120 && h < 180) {
-      r = 0; g = c; b = x;
-    } else if (h >= 180 && h < 240) {
-      r = 0; g = x; b = c;
-    } else if (h >= 240 && h < 300) {
-      r = x; g = 0; b = c;
-    } else if (h >= 300 && h < 360) {
-      r = c; g = 0; b = x;
+    setGradient(colors, direction) {
+        document.body.style.backgroundImage = `linear-gradient(${direction}deg, ${colors.join(', ')})`;
     }
 
-    r = Math.round((r + m) * 255);
-    g = Math.round((g + m) * 255);
-    b = Math.round((b + m) * 255);
+    init() {
+        document.addEventListener('DOMContentLoaded', () => {
+            document.body.style.transition = `background-image ${this.transitionDuration / 1000}s ease-in-out`;
+            this.setGradient(this.colorManager.currentColors, this.directionManager.currentDirection);
 
-    return { r, g, b };
-  }
-
-  generatePreviousGradientArray(count) {
-    const gradientArray = [];
-    for (let i = 0; i < count; i++) {
-      gradientArray.push(this.generateRandomRGB());
+            setInterval(() => this.updateGradient(), this.interval);
+        });
     }
-    return gradientArray;
-  }
-
-  generateRandomRGB() {
-    const r = Math.floor(Math.random() * 256);
-    const g = Math.floor(Math.random() * 256);
-    const b = Math.floor(Math.random() * 256);
-    return `rgb(${r}, ${g}, ${b})`;
-  }
 }
 
-const gradientGenerator = new SmartGradientGenerator();
-setInterval(() => gradientGenerator.applySmartGradient(), 5000);
+class ColorManager {
+    constructor(colorCount) {
+        this.colorCount = colorCount;
+        this.colors = this.generateRandomColors(colorCount);
+        [this.currentColors, this.nextColors] = [this.colors.slice(0, 2), this.colors.slice(2, 4)];
+    }
+
+    static getRandomColor() {
+        return `#${Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0')}`;
+    }
+
+    generateRandomColors(count) {
+        return Array.from({ length: count }, ColorManager.getRandomColor);
+    }
+
+    static interpolateColor(color1, color2, factor) {
+        const interpolate = (start, end) => Math.round(start + factor * (end - start)).toString(16).padStart(2, '0');
+        const [r1, g1, b1] = color1.match(/\w\w/g).map(hex => parseInt(hex, 16));
+        const [r2, g2, b2] = color2.match(/\w\w/g).map(hex => parseInt(hex, 16));
+        return `#${interpolate(r1, r2)}${interpolate(g1, g2)}${interpolate(b1, b2)}`;
+    }
+
+    updateCurrentColors(step) {
+        this.currentColors = this.currentColors.map((color, index) =>
+            ColorManager.interpolateColor(color, this.nextColors[index], step)
+        );
+    }
+
+    setNextColors() {
+        this.nextColors = this.generateRandomColors(2);
+    }
+}
+
+class DirectionManager {
+    constructor() {
+        this.currentDirection = 0;
+        this.nextDirection = DirectionManager.getRandomDirection();
+    }
+
+    static getRandomDirection() {
+        return Math.floor(Math.random() * 360);
+    }
+
+    static interpolateDirection(current, next, factor) {
+        const delta = next - current;
+        const direction = delta > 180 ? current - factor * (360 - delta) : current + factor * delta;
+        return (direction + 360) % 360;
+    }
+
+    updateCurrentDirection(step) {
+        this.currentDirection = DirectionManager.interpolateDirection(this.currentDirection, this.nextDirection, step);
+    }
+
+    setNextDirection() {
+        this.nextDirection = DirectionManager.getRandomDirection();
+    }
+}
+
+new GradientBackground();
