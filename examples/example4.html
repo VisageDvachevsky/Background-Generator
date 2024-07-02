@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Different Color Sets Example</title>
+    <title>Pausing and Resuming Animation Example</title>
     <script src="../background-generator.js"></script>
     <style>
         body {
@@ -15,42 +15,61 @@
             font-family: Arial, sans-serif;
             color: white;
         }
+        button {
+            position: absolute;
+            top: 20px;
+            padding: 10px 20px;
+            font-size: 1rem;
+        }
     </style>
 </head>
 <body>
-    <h1>Different Color Sets</h1>
+    <h1>Pausing and Resuming Animation</h1>
+    <button id="toggleButton">Pause</button>
     <script>
-        // Custom ColorManager to use specific color sets
-        class CustomColorManager extends ColorManager {
-            constructor(colorCount, colorSets) {
-                super(colorCount);
-                this.colorSets = colorSets;
-                this.setNextColors();
-            }
-
-            generateRandomColors(count) {
-                // Use predefined color sets instead of random colors
-                const setIndex = Math.floor(Math.random() * this.colorSets.length);
-                return this.colorSets[setIndex].slice(0, count);
-            }
-        }
-
-        // Define color sets
-        const colorSets = [
-            ['#ff0000', '#00ff00', '#0000ff', '#ffff00'],
-            ['#ff1493', '#1e90ff', '#32cd32', '#ff8c00'],
-            ['#6a5acd', '#ff69b4', '#8a2be2', '#7fff00']
-        ];
-
-        // Create a new GradientBackground instance with custom ColorManager
-        class CustomGradientBackground extends GradientBackground {
-            constructor(interval, transitionDuration, colorSets) {
+        // Custom GradientBackground with pause and resume functionality
+        class PausingGradientBackground extends GradientBackground {
+            constructor(interval, transitionDuration) {
                 super(interval, transitionDuration);
-                this.colorManager = new CustomColorManager(4, colorSets);
+                this.intervalId = null;
+                this.isPaused = false;
+            }
+
+            init() {
+                document.addEventListener('DOMContentLoaded', () => {
+                    document.body.style.transition = `background-image ${this.transitionDuration / 1000}s ease-in-out`;
+                    this.setGradient(this.colorManager.currentColors, this.directionManager.currentDirection);
+                    this.start();
+                });
+
+                const toggleButton = document.getElementById('toggleButton');
+                toggleButton.addEventListener('click', () => {
+                    if (this.isPaused) {
+                        this.resume();
+                        toggleButton.textContent = 'Pause';
+                    } else {
+                        this.pause();
+                        toggleButton.textContent = 'Resume';
+                    }
+                });
+            }
+
+            start() {
+                this.intervalId = setInterval(() => this.updateGradient(), this.interval);
+            }
+
+            pause() {
+                clearInterval(this.intervalId);
+                this.isPaused = true;
+            }
+
+            resume() {
+                this.start();
+                this.isPaused = false;
             }
         }
 
-        new CustomGradientBackground(100, 4000, colorSets);
+        new PausingGradientBackground(100, 4000);
     </script>
 </body>
 </html>
