@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Different Color Sets Example</title>
+    <script src="../background-generator.js"></script>
+    <style>
+        body {
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Different Color Sets</h1>
+    <script>
+        // Custom ColorManager to use specific color sets
+        class CustomColorManager extends ColorManager {
+            constructor(colorCount, colorSets) {
+                super(colorCount);
+                this.colorSets = colorSets;
+                this.setNextColors();
+            }
+
+            generateRandomColors(count) {
+                // Use predefined color sets instead of random colors
+                const setIndex = Math.floor(Math.random() * this.colorSets.length);
+                return this.colorSets[setIndex].slice(0, count);
+            }
+        }
+
+        // Define color sets
+        const colorSets = [
+            ['#ff0000', '#00ff00', '#0000ff', '#ffff00'],
+            ['#ff1493', '#1e90ff', '#32cd32', '#ff8c00'],
+            ['#6a5acd', '#ff69b4', '#8a2be2', '#7fff00']
+        ];
+
+        // Create a new GradientBackground instance with custom ColorManager
+        class CustomGradientBackground extends GradientBackground {
+            constructor(interval, transitionDuration, colorSets) {
+                super(interval, transitionDuration);
+                this.colorManager = new CustomColorManager(4, colorSets);
+            }
+        }
+
+        new CustomGradientBackground(100, 4000, colorSets);
+    </script>
+</body>
+</html>

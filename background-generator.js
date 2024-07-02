@@ -1,7 +1,8 @@
 class GradientBackground {
-    constructor(interval = 100, transitionDuration = 4000) {
+    constructor(interval = 100, transitionDuration = 4000, targetSelector = 'body') {
         this.interval = interval;
         this.transitionDuration = transitionDuration;
+        this.targetSelector = targetSelector;
         this.colorManager = new ColorManager(5);
         this.directionManager = new DirectionManager();
         this.colorChangeCounter = 0;
@@ -24,12 +25,16 @@ class GradientBackground {
     }
 
     setGradient(colors, direction) {
-        document.body.style.backgroundImage = `linear-gradient(${direction}deg, ${colors.join(', ')})`;
+        document.querySelectorAll(this.targetSelector).forEach(element => {
+            element.style.backgroundImage = `linear-gradient(${direction}deg, ${colors.join(', ')})`;
+        });
     }
 
     init() {
         document.addEventListener('DOMContentLoaded', () => {
-            document.body.style.transition = `background-image ${this.transitionDuration / 1000}s ease-in-out`;
+            document.querySelectorAll(this.targetSelector).forEach(element => {
+                element.style.transition = `background-image ${this.transitionDuration / 1000}s ease-in-out`;
+            });
             this.setGradient(this.colorManager.currentColors, this.directionManager.currentDirection);
 
             setInterval(() => this.updateGradient(), this.interval);
@@ -94,5 +99,3 @@ class DirectionManager {
         this.nextDirection = DirectionManager.getRandomDirection();
     }
 }
-
-new GradientBackground();

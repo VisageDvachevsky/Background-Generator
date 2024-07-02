@@ -8,6 +8,8 @@ A JavaScript library for generating dynamic, transitioning background gradients.
 - Randomly changing gradient directions.
 - Customizable transition duration and update interval.
 
+![Demo](assets/demo.gif)
+
 ## Installation
 
 1. Download the `background-generator.js` file and include it in your HTML file:
@@ -132,3 +134,15 @@ Here is a complete example showing how to use the `GradientBackground` class in 
 </body>
 </html>
 ```
+
+## Examples
+
+Explore different usage examples:
+
+- [Basic Example](examples/example1.html)
+- [Customized Interval and Duration](examples/example2.html)
+- [Multiple Instances](examples/example3.html)
+- [Different Color Sets](examples/example4.html)
+- [Pausing and Resuming Animation](examples/example5.html)
+
+To view an example, open the corresponding HTML file in your browser.

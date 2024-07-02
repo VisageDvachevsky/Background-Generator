@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customized Background Generator Example</title>
+    <script src="../background-generator.js"></script>
+    <style>
+        body {
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Customized Interval and Duration</h1>
+    <script>
+        // Create a new GradientBackground instance with custom settings
+        const interval = 200; // Update interval in milliseconds
+        const transitionDuration = 5000; // Transition duration in milliseconds
+        new GradientBackground(interval, transitionDuration);
+    </script>
+</body>
+</html>
